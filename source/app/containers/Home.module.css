@@ -1,0 +1,51 @@
+.container {
+	flex: 1;
+	background-color: #fff;
+	align-items: center;
+	justify-content: center;
+}
+
+.button {
+	border-radius: 10px;
+	background-color: rgb(219, 0, 0);
+	padding: 10px;
+	color: white
+}
+
+.textInput,
+.textareaInput {
+	font-size: 16px;
+	color: #042d3f;
+	border: 0;
+	background-color: #ECEBEB;
+	border-bottom-color: #ECEBEB;
+	border-bottom-width: 1px;
+	padding: 5px;
+	width: 250px;
+}
+
+.textareaInput {
+	height: 70px;
+	font-size: 12px;
+}
+
+.textInputPlaceholder {
+	color: rgba(4, 45, 63, 0.4);
+}
+
+.textInputHasError {
+	color: #e94f57;
+	border-bottom-color: #e94f57
+}
+
+.textInputErrorMessage {
+	fontSize: 12px;
+	color: #e94f57;
+}
+
+.textInputLabel {
+	font-size: 14px;
+	color: #353535;
+	margin-bottom: 2px;
+	margin-top: 10px
+}

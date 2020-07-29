@@ -1,0 +1,12 @@
+version: 1.0.0
+files:
+  - url: TI-Print-Proxy-1.0.0-mac.zip
+    sha512: aA9ne5WV3qB3VfOuxsjhNzczS0vZOnlg+MglQiOySwKfaJH24/+5PUCaBM65tBGk6kS/WBwTp9VzKBzTj5/TcA==
+    size: 73244181
+    blockMapSize: 76267
+  - url: TI-Print-Proxy-1.0.0.dmg
+    sha512: 9w+E6t39Nl5Pl0WU9io0l6S6/huUvMPCu2Mw3FJT3V0duUNKHSRSqGAwVRLqo0cmXakjXcIPOQhOxIfBF9rd7Q==
+    size: 75466146
+path: TI-Print-Proxy-1.0.0-mac.zip
+sha512: aA9ne5WV3qB3VfOuxsjhNzczS0vZOnlg+MglQiOySwKfaJH24/+5PUCaBM65tBGk6kS/WBwTp9VzKBzTj5/TcA==
+releaseDate: '2020-07-23T07:39:13.996Z'
