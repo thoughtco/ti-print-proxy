@@ -14,8 +14,6 @@ const nc2 = new NetcatClient();
 
 import styles from './Home.module.css';
 
-//console.log(styles);
-
 export default function App() {
 	
 	const [serverProcess, setServerProcess] = useState(null);
