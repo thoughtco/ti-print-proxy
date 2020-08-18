@@ -1,7 +1,7 @@
 {
   "name": "ti-print-proxy",
   "productName": "TI Print Proxy",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Print proxy for TastyIgniter Printer Extension",
   "scripts": {
     "build": "concurrently \"yarn build-main\" \"yarn build-renderer\"",

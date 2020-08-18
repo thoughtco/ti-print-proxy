@@ -74,8 +74,9 @@ export default function App() {
 				
 			  	ws.on('message', function incoming(message){
 				  	_log('Printing');
-				  	
-				  	message = message.toString();
+				  		
+				  	// removed this intentionally - send the buffer not a string			  	
+				  	//message = message.toString();
 				  					  	
 				  	nc2
 				  	.addr(formValues.ipaddress)
