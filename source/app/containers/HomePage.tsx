@@ -16,10 +16,11 @@ import styles from './Home.module.css';
 
 export default function App() {
 
+    const [visibleTab, setVisibleTab] = useState('printers');
 	const [serverProcess, setServerProcess] = useState({});
 	const [logData, setLogData] = useState([]);
 	const [printerList, setPrinterList] = useState([
-		{listenport: '9001', ipaddress: '192.168.0.1', port: '9100',},
+		{listenport: '9001', ipaddress: '192.168.0.1', port: '9100', autostart: false, },
     ]);
 	const [formValues, setFormValues] = useState({
 		cert: '',
@@ -41,6 +42,13 @@ export default function App() {
 				setPrinterList(JSON.parse(savedValues));
 			}
 		});
+
+        // autostart printers
+        printerList.forEach(function(printer, idx){
+           if (printer.autostart){
+               _startServer(idx);
+           }
+        });
 
 	}, []);
 
@@ -66,19 +74,19 @@ export default function App() {
 			let client;
 
 			wss.on('listening', function(){
-				_log('printer ' + idx + ' listening for connections on port ' + printerList[idx].listenport);
+				_log('Printer ' + (idx+1) + ': Listening on port ' + printerList[idx].listenport);
 			});
 
 			wss.on('error', function(error){
-				_log(error.message);
+				_log('Printer ' + (idx+1) + ': ' + error.message);
 			});
 
 			wss.on('connection', function connection(ws){
 
-				_log('Connection to printer ' + idx);
+				_log('Printer ' + (idx+1) + ': Connection');
 
 			  	ws.on('message', function incoming(message){
-				  	_log('Printing');
+				  	_log('Printer ' + (idx+1) + ': Printing');
 
 				  	// removed this intentionally - send the buffer not a string
 				  	//message = message.toString();
@@ -100,7 +108,7 @@ export default function App() {
 			setServerProcess(serverProcess);
 
 		} catch (e){
-			_log(e.message);
+			_log('Printer ' + (idx+1) + ':' + e.message);
 		}
 
 	}
@@ -112,9 +120,8 @@ export default function App() {
 			serverProcess[idx].close();
             delete serverProcess[idx];
 			setServerProcess(serverProcess);
+            _log('Printer ' + idx + ': Stopping');
 		}
-
-		_log('Stopping printer ' + idx);
 
 	}
 
@@ -125,6 +132,7 @@ export default function App() {
         }
         newPrinterList.push({listenport: '9001', ipaddress: '192.168.0.1', port: '9100',});
         setPrinterList(newPrinterList);
+        _savePrinters(newPrinterList);
 	}
 
 	function _removePrinter(idx){
@@ -137,6 +145,7 @@ export default function App() {
             }
         }
         setPrinterList(newPrinterList);
+        _savePrinters(newPrinterList);
 	}
 
 	function _log(msg){
@@ -144,22 +153,18 @@ export default function App() {
 		setLogData([...logData]);
 	}
 
-	function _downloadCert(){
-
-		fs.readFile(path.join(__dirname, './certs/localhost.crt'), 'utf8', function(err, contents) {
-		    clipboard.writeText(contents, 'selection')
-		});
-
-	}
+    function _savePrinters(newPrinterList){
+		AsyncStorage.setItem('@Printer:printerList', JSON.stringify(newPrinterList));
+    }
 
 	function handlePrinter(idx, key, event){
         let newPrinterList = [];
         for (let i=0;i<printerList.length;i++){
             newPrinterList.push(printerList[i]);
         }
-		newPrinterList[idx][key] = event.target.value;
+		newPrinterList[idx][key] = key == 'autostart' ? event.target.checked : event.target.value;
 		setPrinterList(newPrinterList);
-		AsyncStorage.setItem('@Printer:printerList', JSON.stringify(newPrinterList));
+        _savePrinters(newPrinterList);
 	}
 
 	function handleChange(key, event){
@@ -175,9 +180,9 @@ export default function App() {
 
         printerList.forEach(function(printer, idx){
         outputPrinters.push((
-            <tr style={{ height: 40 }}>
+            <tr style={{ height: 40 }} key={'printer' + idx}>
                   <td width="10%">
-        				<a onClick={_removePrinter.bind(this, idx)} className={styles.buttonRemove}>X</a>
+        				<a onClick={_removePrinter.bind(this, idx)}><img src="assets/trash.svg" style={{ width: 18, height: 18, marginLeft: 4, marginRight: 10, marginTop: 3 }} /></a>
                   </td>
                   <td width="20%">
         				<input
@@ -185,15 +190,16 @@ export default function App() {
         					value={printer.listenport}
         			        autoCapitalize='none'
         			        className={styles.textInput}
-                            style={{ width: 90 }}
+                            style={{ width: 80 }}
         				/>
                   </td>
-                  <td width="30%">
+                  <td width="35%">
         				<input
         					onChange={text => handlePrinter(idx, 'ipaddress', text)}
         					value={printer.ipaddress}
         			        autoCapitalize='none'
         			        className={styles.textInput}
+                            style={{ width: 140 }}
         				/>
                   </td>
                   <td width="20%">
@@ -202,17 +208,26 @@ export default function App() {
         					value={printer.port}
         			        autoCapitalize='none'
         			        className={styles.textInput}
-                            style={{ width: 90 }}
+                            style={{ width: 80 }}
         				/>
                   </td>
-                  <td width="20%" style={{ textAlign: 'right' }}>
+                  <td width="5%" align="center">
+        				<input
+                            type="checkbox"
+        					onChange={text => handlePrinter(idx, 'autostart', text)}
+        					checked={printer.autostart ? true : false}
+        			        className={styles.textInput}
+                            style={{ opacity: 0 }}
+                            id={'fld-check-' + idx}
+        				/>
+                        <label for={'fld-check-' + idx}></label>
+                  </td>
+                  <td width="10%" style={{ textAlign: 'right' }}>
         				{!serverProcess[idx] &&
-        				  <a onClick={_startServer.bind(this, idx)} className={styles.buttonStart}>Start</a>
+        				  <a onClick={_startServer.bind(this, idx)}><img src="assets/play-circle.svg" style={{ width: 28, height: 28, marginTop: 4 }} /></a>
         				}
         				{serverProcess[idx] &&
-        				  <a onClick={_stopServer.bind(this, idx)} className={styles.buttonStop}>
-        				  	Stop
-        				  </a>
+        				  <a onClick={_stopServer.bind(this, idx)}><img src="assets/stop-circle.svg" style={{ width: 28, height: 28, marginTop: 4 }} /></a>
         				}
                   </td>
                 </tr>
@@ -227,72 +242,77 @@ export default function App() {
 	return (
 	<div className={styles.container}>
 
-		<div style={{ width: '100%', height: 360, display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
+		<div style={{ width: '100%', height: 555, display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
 
-  	      <p style={{ fontSize: 24, marginBottom: 10 }}>Setup</p>
+  	      <p className={styles.tabContainer}>
+            <a onClick={() => setVisibleTab('printers')} className={visibleTab == 'printers' ? styles.tabLinkSelected : styles.tabLink} style={{ marginLeft: 12 }}>Printers</a>
+            <a onClick={() => setVisibleTab('ssl')} className={visibleTab == 'ssl' ? styles.tabLinkSelected : styles.tabLink} style={{ marginLeft: 22 }}>SSL</a>
+            <a onClick={() => setVisibleTab('logs')} className={visibleTab == 'logs' ? styles.tabLinkSelected : styles.tabLink} style={{ marginLeft: 22 }}>Logs</a>
+          </p>
 
-		  <div style={{ width: '100%', display: 'flex', flexDirection: 'row', backgroundColor: '#ccc' }}>
+          {visibleTab == 'ssl' && (
+            <div style={{ width: '100%', padding: 12, paddingTop: 0, }}>
 
-  			<div style={{ padding: 20, paddingTop: 10 }}>
+            	<label for="fld-ssl-cert" className={styles.textInputLabel} style={{ marginTop: 20 }}>Certificate</label>
 
-  				<p className={styles.textInputLabel}>SSL cert</p>
+            	<textarea
+                    id="fld-ssl-cert"
+            		onChange={text => handleChange('cert', text)}
+            		value={formValues.cert}
+                    autoCapitalize='none'
+                    className={styles.textareaInput}
+            	/>
 
-  				<textarea
-  					onChange={text => handleChange('cert', text)}
-  					value={formValues.cert}
-  			        autoCapitalize='none'
-  			        className={styles.textareaInput}
-  				/>
+            	<label for="fld-ssl-key" className={styles.textInputLabel} style={{ marginTop: 20 }}>Private key</label>
+
+            	<textarea
+                    id="fld-ssl-key"
+            		onChange={text => handleChange('key', text)}
+            		value={formValues.key}
+                    autoCapitalize='none'
+                    className={styles.textareaInput}
+            	/>
 
             </div>
+        )}
 
-  		    <div style={{ padding: 20, paddingTop: 10, paddingLeft: 0, marginLeft: -15 }}>
+        {visibleTab == 'printers' && (
+            <div style={{ width: '100%' }}>
 
-  				<p className={styles.textInputLabel}>SSL key</p>
+        		<div style={{ flex: 1, paddingTop: 20, paddingLeft: 12, paddingRight: 12, }}>
 
-  				<textarea
-  					onChange={text => handleChange('key', text)}
-  					value={formValues.key}
-  			        autoCapitalize='none'
-  			        className={styles.textareaInput}
-  				/>
+                    <table width="100%">
+                      <thead>
+                          <tr>
+                            <th> </th>
+                            <th className={styles.textInputLabel}>Listen port</th>
+                            <th className={styles.textInputLabel}>Printer IP</th>
+                            <th className={styles.textInputLabel}>Printer port</th>
+                            <th className={styles.textInputLabel}>Autostart</th>
+                            <th> </th>
+                          </tr>
+                      </thead>
+                      <tbody id="printerList">
+                        {outputPrinters}
+                      </tbody>
+                    </table>
 
-            </div>
+                    <div style={{ marginTop: 12, marginBottom: 20 }}>
+                		<a onClick={_addPrinter.bind(this)}><img src="assets/plus-circle.svg" style={{ width: 28, height: 28 }} /></a>
+                    </div>
+
+        		</div>
+
+            </div>)
+        }
+
+        {visibleTab == 'logs' && (
+    		<div style={{ width: '100%', flex: 1, overflow: 'scroll' }}>
+    			<pre style={{ padding: 12, margin: 0, fontSize: 12 }}>{[...logData].reverse().join("\n")}</pre>
+    		</div>)
+        }
 
         </div>
-
-		<div style={{ flex: 1, paddingTop: 20, }}>
-
-        <table width="100%">
-          <tr>
-            <th> </th>
-            <th className={styles.textInputLabel}>Listen port</th>
-            <th className={styles.textInputLabel}>Printer IP</th>
-            <th className={styles.textInputLabel}>Printer port</th>
-            <th> </th>
-          </tr>
-          <tbody id="printerList">
-            {outputPrinters}
-          </tbody>
-        </table>
-
-        <div style={{ marginTop: 20 }}>
-    		  <a onClick={_addPrinter.bind(this)} className={styles.buttonAdd}>Add printer</a>
-        </div>
-
-			</div>
-
-		</div>
-
-		<div style={{ width: '100%', flex: 1, paddingTop: 20 }}>
-
-			<p style={{ fontSize: 24, marginBottom: 10 }}>Logs</p>
-
-			<div style={{ fontSize: 12, borderWidth: 1, borderStyle:'solid', borderColor: '#ccc', overflow: 'scroll', height: 120, boxSizing:'border-box', width: '100%' }}>
-				<pre style={{ padding: 0, margin: 0 }}>{[...logData].reverse().join("\n")}</pre>
-			</div>
-
-		</div>
 
 	</div>
 	);

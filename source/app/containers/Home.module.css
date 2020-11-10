@@ -1,8 +1,47 @@
+body {
+  margin: 0px;
+  color: #111;
+}
+
+input[type="checkbox"] {
+  display: none;
+}
+
+input[type="checkbox"] + label {
+  width: 26px;
+  height: 26px;
+  background: url('../assets/circle.svg') no-repeat;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+input[type="checkbox"]:checked + label {
+  background: url('../assets/check-circle.svg') no-repeat;
+}
+
 .container {
 	flex: 1;
 	background-color: #fff;
 	align-items: center;
 	justify-content: center;
+}
+
+.tabContainer {
+  font-size: 24px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgb(210, 210, 210);
+}
+
+.tabLink,
+.tabLinkSelected {
+  font-size: 24px;
+  padding-top: 8px;
+  display: inline-block;
+  color: rgb(110, 110, 110);
+}
+
+.tabLinkSelected {
+  color: #111;
 }
 
 .buttonStart {
@@ -46,12 +85,14 @@
 	border-bottom-color: #ECEBEB;
 	border-bottom-width: 1px;
 	padding: 5px;
-	width: 250px;
+  outline: none;
 }
 
 .textareaInput {
-	height: 70px;
-	font-size: 12px;
+	height: 180px;
+	font-size: 13px;
+	width: 505px;
+  resize: none;
 }
 
 .textInputPlaceholder {
@@ -74,4 +115,24 @@
 	margin-bottom: 2px;
 	margin-top: 10px;
   text-align: left;
+  font-weight: bold;
+}
+
+label.textInputLabel {
+  display: block;
+  font-size: 16px;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+table tr th {
+  padding-bottom: 5px;
+}
+
+table tr th,
+table tr td {
+  border-bottom: 1px solid rgb(210, 210, 210);
+  background: '#ccc';
 }
