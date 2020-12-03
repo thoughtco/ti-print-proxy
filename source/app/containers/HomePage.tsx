@@ -187,7 +187,7 @@ export default function App() {
         outputPrinters.push((
             <tr style={{ height: 40 }} key={'printer' + idx}>
                   <td width="10%">
-        				<a onClick={_removePrinter.bind(this, idx)}><img src="assets/trash.svg" style={{ width: 18, height: 18, marginLeft: 4, marginRight: 10, marginTop: 3 }} /></a>
+        				<a onClick={_removePrinter.bind(this, idx)}><span style={{ display: 'inline-block', background: 'url(assets/trash.svg) no-repeat', width: 18, height: 18, marginLeft: 4, marginRight: 10, marginTop: 3 }}></span></a>
                   </td>
                   <td width="20%">
         				<input
@@ -225,14 +225,14 @@ export default function App() {
                             style={{ opacity: 0 }}
                             id={'fld-check-' + idx}
         				/>
-                        <label for={'fld-check-' + idx}></label>
+                        <label htmlFor={'fld-check-' + idx}></label>
                   </td>
                   <td width="10%" style={{ textAlign: 'right' }}>
         				{!serverProcess[idx] &&
-        				  <a onClick={_startServer.bind(this, idx)}><img src="assets/play-circle.svg" style={{ width: 28, height: 28, marginTop: 4 }} /></a>
+        				  <a onClick={_startServer.bind(this, idx)}><span style={{ display: 'inline-block', background: 'url(assets/play-circle.svg) no-repeat', width: 28, height: 28, marginTop: 4 }}></span></a>
         				}
         				{serverProcess[idx] &&
-        				  <a onClick={_stopServer.bind(this, idx)}><img src="assets/stop-circle.svg" style={{ width: 28, height: 28, marginTop: 4 }} /></a>
+        				  <a onClick={_stopServer.bind(this, idx)}><span style={{ display: 'inline-block', background: 'url(assets/stop-circle.svg) no-repeat', width: 28, height: 28, marginTop: 4 }}></span></a>
         				}
                   </td>
                 </tr>
@@ -303,7 +303,7 @@ export default function App() {
                     </table>
 
                     <div style={{ marginTop: 12, marginBottom: 20 }}>
-                		<a onClick={_addPrinter.bind(this)}><img src="assets/plus-circle.svg" style={{ width: 28, height: 28 }} /></a>
+                		<a onClick={_addPrinter.bind(this)}><span style={{ display: 'inline-block', background: 'url(assets/plus-circle.svg) no-repeat', width: 28, height: 28 }}></span></a>
                     </div>
 
         		</div>
