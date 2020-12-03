@@ -31,24 +31,29 @@ export default function App() {
 
 		AsyncStorage.getItem('@Printer:savedValues')
 		.then(savedValues => {
-			if (savedValues !== null) {
+			if (savedValues !== null)
+            {
 				setFormValues(JSON.parse(savedValues));
 			}
 		});
 
 		AsyncStorage.getItem('@Printer:printerList')
 		.then(savedValues => {
-			if (savedValues !== null) {
-				setPrinterList(JSON.parse(savedValues));
+			if (savedValues !== null)
+            {
+
+                let newPrinterList = JSON.parse(savedValues);
+                setPrinterList(newPrinterList);
+
+                // autostart printers
+                newPrinterList.forEach(function(printer, idx){
+                   if (printer.autostart){
+                       _startServer(idx);
+                   }
+                });
+
 			}
 		});
-
-        // autostart printers
-        printerList.forEach(function(printer, idx){
-           if (printer.autostart){
-               _startServer(idx);
-           }
-        });
 
 	}, []);
 
